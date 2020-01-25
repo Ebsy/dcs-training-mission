@@ -1,0 +1,22 @@
+version: 1.0.{build}
+skip_branch_with_pr: true
+clone_folder: c:\projects\dcs-train
+install:
+- cmd: choco install 7zip.commandline
+cache:
+- C:\ProgramData\chocolatey\lib
+- C:\ProgramData\chocolatey\bin
+build_script:
+- cmd: 7za a -bb0 temp.miz C:\projects\dcs-train\* -xr!.git -x!*.miz -x!*.yml && IF /I "%APPVEYOR_REPO_TAG%"=="true" (ren temp.miz dcs-tr%APPVEYOR_REPO_TAG_NAME%.miz) ELSE (ren temp.miz dcs-tr_%APPVEYOR_BUILD_VERSION%.miz)
+artifacts:
+- path: '*.miz'
+  name: dcs-train
+deploy:
+- provider: GitHub
+  auth_token:
+    secure: 9phjdv1fyicXjuaiD9DqvGI4ZFzZKDD5tzVl8xlcnLXK1XjynvJJUQP+42F2Mhmj
+  artifact: dcs-train
+  draft: true
+  force_update: true
+  on:
+    branch: master
